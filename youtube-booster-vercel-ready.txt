@@ -1,0 +1,151 @@
+
+youtube-booster-vercel-ready/
+│
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── dashboard/
+│       └── page.tsx
+│
+├── lib/
+│   └── db.ts
+│
+├── sql/
+│   └── schema.sql
+│
+├── public/
+│   └── favicon.ico
+│
+├── package.json
+├── next.config.js
+├── .env.example
+└── README.md
+
+
+================ FILE: package.json ================
+{
+  "name": "youtube-booster",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "pg": "^8.11.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
+
+================ FILE: next.config.js ================
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+};
+
+module.exports = nextConfig;
+
+================ FILE: .env.example ================
+# Database connection (Neon, Supabase, or PostgreSQL)
+DATABASE_URL=postgresql://username:password@host:5432/database
+
+# USDT TRC20 Wallet
+USDT_WALLET=THBYKHP9A1a6PJu874WTf39Xj9uWXAwVn1
+
+# JWT secret (for auth sessions)
+NEXTAUTH_SECRET=changeme
+
+# Admin email
+ADMIN_EMAIL=alegbegodswill2@gmail.com
+
+================ FILE: README.md ================
+# YouTube Booster
+
+This project is a Next.js app for managing YouTube channel growth services.
+
+## Features
+- User signup/login
+- Dashboard with subscription status
+- Payment tracking (USDT TRC20)
+- Admin can update reports
+- Auto-expiring subscriptions every 24h
+
+## Setup
+1. Copy `.env.example` → `.env.local` and fill values.
+2. Run `npm install`.
+3. Run `npm run dev` for development.
+
+================ FILE: app/layout.tsx ================
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+
+================ FILE: app/page.tsx ================
+export default function HomePage() {
+  return (
+    <main>
+      <h1>Welcome to YouTube Booster</h1>
+      <p>Boost your YouTube channel with SEO, hashtags, and management.</p>
+    </main>
+  );
+}
+
+================ FILE: app/dashboard/page.tsx ================
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function Dashboard() {
+  const [status, setStatus] = useState("Expired");
+  const [report, setReport] = useState("No report yet.");
+
+  useEffect(() => {
+    // TODO: Fetch real data from backend
+    setStatus("Active");
+    setReport("You gained 10 subscribers and 50 views in the last 24h.");
+  }, []);
+
+  return (
+    <main>
+      <h1>Your Dashboard</h1>
+      <p>Status: {status}</p>
+      <p>Latest Report: {report}</p>
+    </main>
+  );
+}
+
+================ FILE: lib/db.ts ================
+// Example database connection file
+import { Pool } from "pg";
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export default pool;
+
+================ FILE: sql/schema.sql ================
+-- Example schema
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  channel_link TEXT,
+  status TEXT DEFAULT 'Expired',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE reports (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  report TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
